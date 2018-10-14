@@ -92,6 +92,25 @@ app.patch('/todos/:id', (req, res) => {
     })
 });
 
+// POST /users
+app.post('/users', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+    //We can choose to not have .then(("user") =>) 
+    //because user variable returned is the same as 
+    //the one defined above
+    user.save().then(() => { 
+        return user.generateAuthToken();
+        //res.send(user)
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => {
+        //console.log("Caught errore", e);
+        res.status(400);
+        res.send(e);
+    });
+});
+
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
